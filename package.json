@@ -1,16 +1,28 @@
 {
-  "name": "factory-io",
+  "name": "factory.io",
   "version": "0.0.1",
-  "description": "Class factory/fixtures",
-  "main": "dist/index.js",
-  "author": "nalhin",
+  "description": "Typescript test data factory based on preexisting classes or interfaces",
+  "keywords": [
+    "factory",
+    "class",
+    "test",
+    "fixtures"
+  ],
+  "main": "lib/index.js",
+  "typings": "lib/index",
+  "files": [
+    "lib/"
+  ],
+  "author": "Krzysztof Olipra",
   "license": "MIT",
+  "repository": "https://github.com/Nalhin/factory.io",
   "scripts": {
-    "build": "tsc -p tsconfig.build.json",
-    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "build": "tsc -p tsconfig.build.json --outDir lib",
+    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\" README.md",
     "test": "jest",
     "test:cov": "jest --coverage",
-    "lint": "eslint \"{src,test}/**/*.ts\" --fix && tsc --p tsconfig.build.json --emitDeclarationOnly"
+    "lint": "eslint \"{src,test}/**/*.ts\" --fix && tsc --p tsconfig.build.json --emitDeclarationOnly",
+    "publish": "npm run build && npm login && npm publish"
   },
   "husky": {
     "hooks": {
@@ -19,11 +31,11 @@
   },
   "lint-staged": {
     "*.+(ts|graphql)": [
-      "eslint --fix",
-      "git add"
+      "eslint --fix"
     ]
   },
   "devDependencies": {
+    "@types/deepmerge": "^2.2.0",
     "@types/faker": "^4.1.11",
     "@types/jest": "^25.2.1",
     "@typescript-eslint/eslint-plugin": "^2.29.0",
@@ -37,5 +49,8 @@
     "prettier": "^2.0.5",
     "ts-jest": "^25.4.0",
     "typescript": "^3.8.3"
+  },
+  "dependencies": {
+    "deepmerge": "^4.2.2"
   }
 }

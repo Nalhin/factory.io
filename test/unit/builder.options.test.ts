@@ -8,7 +8,9 @@ describe('factoryOptions', () => {
         id: number;
         firstName: string;
       }
-      const userFactory = new Factory<IUser>().setOptions({ idField: 'id' });
+      const userFactory = new Factory<IUser>()
+        .options({ idField: 'id' })
+        .done();
 
       const result = userFactory.buildMany(5);
 
@@ -19,10 +21,12 @@ describe('factoryOptions', () => {
   describe('idFactory', () => {
     it('should allow to declare function responsible for id generation', () => {
       const expectedId = 1;
-      const userFactory = new Factory<User>().setOptions({
-        idField: 'id',
-        idTransformer: () => expectedId,
-      });
+      const userFactory = new Factory<User>()
+        .options({
+          idField: 'id',
+          idTransformer: () => expectedId,
+        })
+        .done();
 
       const result = userFactory.buildMany(5);
 
@@ -32,9 +36,11 @@ describe('factoryOptions', () => {
 
   describe('removeUnassigned', () => {
     it('should keep unassigned properties by default', () => {
-      const userFactory = new Factory(User).setOptions({
-        removeUnassigned: false,
-      });
+      const userFactory = new Factory(User)
+        .options({
+          removeUnassigned: false,
+        })
+        .done();
 
       const result = userFactory.buildOne();
 
@@ -42,9 +48,11 @@ describe('factoryOptions', () => {
     });
 
     it('should remove unassigned properties', () => {
-      const userFactory = new Factory(User).setOptions({
-        removeUnassigned: true,
-      });
+      const userFactory = new Factory(User)
+        .options({
+          removeUnassigned: true,
+        })
+        .done();
 
       const result = userFactory.buildOne();
 
