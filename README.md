@@ -1,6 +1,7 @@
 [![Test](https://github.com/Nalhin/factory.io/workflows/Test/badge.svg)](https://github.com/Nalhin/factory.io/actions)
+[![Codecov](https://codecov.io/gh/Nalhin/factory.io/branch/master/graph/badge.svg)](https://codecov.io/gh/Nalhin/factory.io)
 
-# factory-io
+# factory.io
 
 Typescript class based mock data generation made simple
 

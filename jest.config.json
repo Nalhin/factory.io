@@ -4,8 +4,8 @@
     "json",
     "ts"
   ],
-  "rootDir": "test",
-  "testRegex": ".test.ts$",
+  "rootDir": ".",
+  "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.ts?$",
   "transform": {
     "^.+\\.(t|j)s$": "ts-jest"
   },
