@@ -1,0 +1,41 @@
+{
+  "name": "factory-io",
+  "version": "0.0.1",
+  "description": "Class factory/fixtures",
+  "main": "dist/index.js",
+  "author": "nalhin",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "test": "jest",
+    "test:cov": "jest --coverage",
+    "lint": "eslint \"{src,test}/**/*.ts\" --fix && tsc --p tsconfig.build.json --emitDeclarationOnly"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.+(ts|graphql)": [
+      "eslint --fix",
+      "git add"
+    ]
+  },
+  "devDependencies": {
+    "@types/faker": "^4.1.11",
+    "@types/jest": "^25.2.1",
+    "@typescript-eslint/eslint-plugin": "^2.29.0",
+    "@typescript-eslint/parser": "^2.29.0",
+    "eslint": "^6.8.0",
+    "eslint-config-prettier": "^6.10.1",
+    "faker": "^4.1.0",
+    "husky": "^4.2.5",
+    "jest": "^25.4.0",
+    "lint-staged": "^10.1.7",
+    "prettier": "^2.0.5",
+    "ts-jest": "^25.4.0",
+    "typescript": "^3.8.3"
+  }
+}
