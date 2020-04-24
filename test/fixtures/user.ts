@@ -12,3 +12,10 @@ export class User {
     this.username = username;
   }
 }
+
+export class PartialUser {
+  id?: string;
+  username: string;
+  age: number;
+  birthDay: Date;
+}

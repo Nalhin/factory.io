@@ -7,8 +7,8 @@ export class Builder<T> {
 
   constructor(
     private _options: BuilderOptions<T, any>,
-    private _properties: Properties<T, any>,
-    private _computed: Computed<T, any>,
+    private _properties: Properties<T, keyof T>,
+    private _computed: Computed<T, keyof T>,
     private _mixin: Builder<Partial<T>>[],
     private _entity?: Class<T>,
   ) {}
@@ -27,7 +27,7 @@ export class Builder<T> {
   }
 
   private build(partial?: Partial<T>): T {
-    const entity = this._entity ? this.prepareEntity() : {};
+    const entity = this._entity ? this.prepareEntity() : ({} as T);
 
     for (const mixin of this._mixin) {
       Object.assign(entity, mixin.build());
@@ -43,19 +43,19 @@ export class Builder<T> {
 
     for (const key of Object.keys(this._properties)) {
       if (typeof this._properties[key] === 'function') {
-        entity[key] = (this._properties[key] as Function)();
+        entity[key] = this._properties[key]();
       } else {
         entity[key] = this._properties[key];
       }
     }
 
     for (const key of Object.keys(this._computed)) {
-      entity[key] = this._computed[key](entity as T);
+      entity[key] = this._computed[key](entity);
     }
 
     Object.assign(entity, partial);
 
-    return entity as T;
+    return entity;
   }
 
   public buildOne(partial?: Partial<T>): T {
@@ -73,7 +73,7 @@ export class Builder<T> {
   }
 
   public buildOneAsync(
-    callback: (...entities: T[]) => Promise<any>,
+    callback: (entity: T) => Promise<any>,
     partial?: Partial<T>,
   ): Promise<T> {
     const entity = this.build(partial);
@@ -81,7 +81,7 @@ export class Builder<T> {
     return callback(entity);
   }
 
-  public async buildManyAsync(
+  public buildManyAsync(
     callback: (...entities: T[]) => Promise<any>,
     count: number,
   ): Promise<T[]> {

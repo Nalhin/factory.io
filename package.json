@@ -1,6 +1,6 @@
 {
   "name": "factory.io",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Modern class based mock data generation with typescript support.",
   "keywords": [
     "factory",
@@ -10,16 +10,16 @@
     "typescript",
     "typeorm"
   ],
-  "main": "lib/index.js",
-  "typings": "lib/index",
+  "main": "dist/index.js",
+  "typings": "dist/index",
   "files": [
-    "lib/"
+    "dist/"
   ],
   "author": "Krzysztof Olipra",
   "license": "MIT",
   "repository": "https://github.com/Nalhin/factory.io",
   "scripts": {
-    "build": "tsc -p tsconfig.build.json --outDir lib",
+    "build": "tsc -p tsconfig.build.json",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\" README.md",
     "test": "jest",
     "test:cov": "jest --coverage",
@@ -32,12 +32,11 @@
     }
   },
   "lint-staged": {
-    "*.+(ts|graphql)": [
+    "*.+(ts|tsx)": [
       "eslint --fix"
     ]
   },
   "devDependencies": {
-    "@types/deepmerge": "^2.2.0",
     "@types/faker": "^4.1.11",
     "@types/jest": "^25.2.1",
     "@typescript-eslint/eslint-plugin": "^2.29.0",
@@ -53,6 +52,5 @@
     "typescript": "^3.8.3"
   },
   "dependencies": {
-    "deepmerge": "^4.2.2"
   }
 }

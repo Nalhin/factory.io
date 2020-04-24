@@ -1,5 +1,5 @@
 import { Factory } from '../../src';
-import { User } from '../fixtures/user';
+import { PartialUser, User } from '../fixtures/user';
 import * as faker from 'faker';
 
 describe('factory', () => {
@@ -131,13 +131,31 @@ describe('factory', () => {
       const mixinUserFactory = new Factory(User).props(properties).done();
       const userFactory = new Factory(User)
         .props({ age: expectedAge })
-        .mixins(mixinUserFactory)
+        .mixins([mixinUserFactory])
         .done();
 
       const result = userFactory.buildOne();
 
       expect(result.age).toBe(expectedAge);
       expect(result.username).toBe(properties.username);
+    });
+    it('should resolve multiple mixins in correct order', () => {
+      const expectedUsername = faker.internet.userName();
+      const mixinPartialUserFactory = new Factory(PartialUser)
+        .computed({
+          username: () => faker.internet.userName(),
+        })
+        .done();
+      const mixinUserFactory = new Factory(User)
+        .props({ username: expectedUsername })
+        .done();
+      const userFactory = new Factory(User)
+        .mixins([mixinPartialUserFactory, mixinUserFactory])
+        .done();
+
+      const result = userFactory.buildOne();
+
+      expect(result.username).toBe(expectedUsername);
     });
   });
 });

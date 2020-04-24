@@ -13,11 +13,12 @@ describe('builder', () => {
           username: faker.internet.userName,
         })
         .done();
+
       const userFactory = new Factory(User)
         .props({
           age: expectedAge,
         })
-        .mixins(mixinUserFactory)
+        .mixins([mixinUserFactory])
         .done();
 
       const result = userFactory.buildOne();
