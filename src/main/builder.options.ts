@@ -1,10 +1,10 @@
 export class BuilderOptions<T, K extends keyof T> {
   /**
-   * Object property where id should be assigned to
+   * Object property to which id should be assigned
    */
   idField?: K;
   /**
-   * Pass custom function responsible for object id generation.
+   * Custom function responsible for object id generation.
    *
    *@param number  unique number
    */
@@ -14,7 +14,7 @@ export class BuilderOptions<T, K extends keyof T> {
    */
   removeUnassigned?: boolean;
   /**
-   * Initial id value, incremented by one in each step
+   * Initial id value, incremented by one in each time an object is build
    */
   defaultIdValue?: number = 1;
 

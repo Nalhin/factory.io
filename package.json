@@ -1,12 +1,14 @@
 {
   "name": "factory.io",
   "version": "0.0.1",
-  "description": "Typescript test data factory based on preexisting classes or interfaces",
+  "description": "Modern class based mock data generation with typescript support.",
   "keywords": [
     "factory",
     "class",
     "test",
-    "fixtures"
+    "fixtures",
+    "typescript",
+    "typeorm"
   ],
   "main": "lib/index.js",
   "typings": "lib/index",
