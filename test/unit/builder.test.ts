@@ -105,23 +105,6 @@ describe('builder', () => {
     });
   });
 
-  describe('buildOneAsync', () => {
-    it('should fire callback after object creation with object as argument', async () => {
-      const properties = {
-        id: faker.random.uuid(),
-        age: faker.random.number(),
-        username: faker.internet.userName(),
-      };
-      const callback = jest.fn();
-      const userFactory = new Factory(User).props(properties).done();
-
-      await userFactory.buildOneAsync(callback);
-
-      expect(callback).toBeCalledTimes(1);
-      expect(callback).toBeCalledWith(properties);
-    });
-  });
-
   describe('buildMany', () => {
     it('should build multiple objects', () => {
       const count = 5;
@@ -151,24 +134,6 @@ describe('builder', () => {
       const result = userFactory.buildMany(2);
 
       expect(result[0].username).toBe(result[1].username);
-    });
-  });
-
-  describe('buildManyAsync', () => {
-    it('should fire callback after object creation with objects as arguments', async () => {
-      const properties = {
-        id: faker.random.uuid(),
-        age: faker.random.number(),
-        username: faker.internet.userName(),
-      };
-      const callback = jest.fn();
-      const count = 3;
-      const userFactory = new Factory(User).props(properties).done();
-
-      await userFactory.buildManyAsync(callback, count);
-
-      expect(callback).toBeCalledTimes(1);
-      expect(callback).toBeCalledWith(properties, properties, properties);
     });
   });
 

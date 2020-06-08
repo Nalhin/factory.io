@@ -1,6 +1,6 @@
 export class BuilderOptions<T, K extends keyof T> {
   /**
-   * Object property to which id should be assigned
+   * Object property to which id should be assigned.
    */
   idField?: K;
   /**
@@ -10,11 +10,11 @@ export class BuilderOptions<T, K extends keyof T> {
    */
   idTransformer?: (id: number) => number | string;
   /**
-   * Whether undefined fields should be removed (as constructor is passed with no arguments, fields  without default values are assigned as undefined)
+   * Whether undefined fields should be removed (as constructor is passed with no arguments, fields  without default values are assigned as undefined).
    */
   removeUnassigned?: boolean;
   /**
-   * Initial id value, incremented by one in each time an object is build
+   * Initial id value, incremented by one in each time an object is build.
    */
   defaultIdValue?: number = 1;
 

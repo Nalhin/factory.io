@@ -1,6 +1,6 @@
 {
   "name": "factory.io",
-  "version": "0.0.3",
+  "version": "0.0.5",
   "description": "Modern class based mock data generation with typescript support.",
   "keywords": [
     "factory",

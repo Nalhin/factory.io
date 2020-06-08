@@ -72,28 +72,6 @@ export class Builder<T> {
     return entities;
   }
 
-  public buildOneAsync(
-    callback: (entity: T) => Promise<any>,
-    partial?: Partial<T>,
-  ): Promise<T> {
-    const entity = this.build(partial);
-
-    return callback(entity);
-  }
-
-  public buildManyAsync(
-    callback: (...entities: T[]) => Promise<any>,
-    count: number,
-  ): Promise<T[]> {
-    const entities = [];
-
-    for (let i = 0; i < count; i++) {
-      entities.push(this.build());
-    }
-
-    return callback(...entities);
-  }
-
   public resetId() {
     this.idCounter = 1;
   }
