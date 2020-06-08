@@ -67,6 +67,30 @@ describe('builder', () => {
       expect(result.age).toBe(age * 2);
     });
 
+    it('should resolve recursive props', () => {
+      const username = faker.random.word();
+
+      const userFactory = new Factory(User)
+        .props({
+          friend: {
+            username,
+            age: faker.random.number,
+            birthDay: faker.date.future(),
+            friend: {
+              username,
+              age: faker.random.number,
+              birthDay: faker.date.future(),
+            },
+          },
+        })
+        .done();
+
+      const result = userFactory.buildOne();
+
+      expect(result.friend.friend.username).toBe(username);
+      expect(typeof result.friend.friend.age).toBe('number');
+    });
+
     it('should work with interfaces', () => {
       interface IUser {
         id: number;

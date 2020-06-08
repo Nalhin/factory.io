@@ -1,6 +1,7 @@
 import { Computed, Properties } from '../types/types';
 import { Class } from '../types/helpers';
 import { BuilderOptions } from './builder.options';
+import isObject from './utils';
 
 export class Builder<T> {
   private idCounter = this._options.defaultIdValue;
@@ -26,6 +27,23 @@ export class Builder<T> {
     return entity;
   }
 
+  private enrichWithProperties(entity: T): void {
+    this.recursiveProperty(entity, this._properties);
+  }
+
+  private recursiveProperty(entity: T, properties: Properties<T, keyof T>) {
+    for (const key of Object.keys(properties)) {
+      if (isObject(properties[key])) {
+        entity[key] = {};
+        this.recursiveProperty(entity[key], properties[key]);
+      } else if (typeof properties[key] === 'function') {
+        entity[key] = properties[key]();
+      } else {
+        entity[key] = properties[key];
+      }
+    }
+  }
+
   private build(partial?: Partial<T>): T {
     const entity = this._entity ? this.prepareEntity() : ({} as T);
 
@@ -41,13 +59,7 @@ export class Builder<T> {
       this.idCounter++;
     }
 
-    for (const key of Object.keys(this._properties)) {
-      if (typeof this._properties[key] === 'function') {
-        entity[key] = this._properties[key]();
-      } else {
-        entity[key] = this._properties[key];
-      }
-    }
+    this.enrichWithProperties(entity);
 
     for (const key of Object.keys(this._computed)) {
       entity[key] = this._computed[key](entity);

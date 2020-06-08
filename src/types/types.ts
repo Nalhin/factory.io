@@ -1,4 +1,7 @@
-export type Property<T, K extends keyof T> = (() => T[K]) | T[K];
+export type Property<T, K extends keyof T> =
+  | (() => T[K])
+  | T[K]
+  | Properties<T[K], keyof T[K]>;
 export type Properties<T, Keys extends keyof T> = {
   [K in Keys]: Property<T, K>;
 };

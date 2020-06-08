@@ -84,7 +84,6 @@ const user = userFactory.buildOne();
 Use mixins in order to extend previously constructed factory.
 Remember that mixins are resolved in a **given order and before** props and computed of factory currently being extended.
 
-
 ```ts
 const mixinUserFactory = new Factory(User)
   .props({
@@ -122,11 +121,11 @@ Class builders **cannot** be assigned new properties and this process cannot be 
 
 Builder object has the following methods
 
-* buildOne
-* buildOneAsync
-* buildMany
-* buildManyAsync
-* resetId
+- buildOne
+- buildOneAsync
+- buildMany
+- buildManyAsync
+- resetId
 
 Async methods expect callback to be passed as the first argument.
 

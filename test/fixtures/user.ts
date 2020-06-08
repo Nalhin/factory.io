@@ -6,6 +6,7 @@ export class User {
   email: string;
   birthDay: Date;
   monthsAlive?: number;
+  friend?: PartialUser;
 
   constructor(id: string, username: string) {
     this.id = id;
@@ -18,4 +19,5 @@ export class PartialUser {
   username: string;
   age: number;
   birthDay: Date;
+  friend?: PartialUser;
 }
