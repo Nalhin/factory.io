@@ -4,38 +4,42 @@ import { BuilderOptions } from './builder.options';
 import isObject from './utils';
 
 export class Builder<T> {
-  private idCounter = this._options.defaultIdValue;
+  private _idCounter = this._options.defaultIdValue;
 
   constructor(
-    private _options: BuilderOptions<T, any>,
     private _properties: Properties<T, keyof T>,
     private _computed: Computed<T, keyof T>,
     private _mixin: Builder<Partial<T>>[],
+    private _options: BuilderOptions<T, keyof T>,
     private _entity?: Class<T>,
   ) {}
 
   private prepareEntity(): T {
-    const entity = new this._entity();
+    const entity = this._entity ? new this._entity() : ({} as T);
 
     if (this._options.removeUnassigned) {
-      Object.keys(entity).forEach((key) => {
+      for (const key of Object.keys(entity)) {
         if (entity[key] === undefined) {
           delete entity[key];
         }
-      });
+      }
     }
+
     return entity;
   }
 
-  private enrichWithProperties(entity: T): void {
-    this.recursiveProperty(entity, this._properties);
+  private enrichWithProps(entity: T): void {
+    this.setRecursiveProperties(entity, this._properties);
   }
 
-  private recursiveProperty(entity: T, properties: Properties<T, keyof T>) {
+  private setRecursiveProperties(
+    entity: T,
+    properties: Properties<T, keyof T>,
+  ) {
     for (const key of Object.keys(properties)) {
       if (isObject(properties[key])) {
         entity[key] = {};
-        this.recursiveProperty(entity[key], properties[key]);
+        this.setRecursiveProperties(entity[key], properties[key]);
       } else if (typeof properties[key] === 'function') {
         entity[key] = properties[key]();
       } else {
@@ -44,27 +48,35 @@ export class Builder<T> {
     }
   }
 
-  private build(partial?: Partial<T>): T {
-    const entity = this._entity ? this.prepareEntity() : ({} as T);
-
+  private enrichWithMixins(entity: T): void {
     for (const mixin of this._mixin) {
       Object.assign(entity, mixin.build());
     }
+  }
 
+  private enrichWithId(entity: T): void {
     const { idField, idTransformer } = this._options;
     if (idField) {
       entity[idField] = idTransformer
-        ? idTransformer(this.idCounter)
-        : this.idCounter;
-      this.idCounter++;
+        ? idTransformer(this._idCounter)
+        : ((this._idCounter as unknown) as T[keyof T]);
+      this._idCounter++;
     }
+  }
 
-    this.enrichWithProperties(entity);
-
+  private enrichWithComputed(entity: T): void {
     for (const key of Object.keys(this._computed)) {
       entity[key] = this._computed[key](entity);
     }
+  }
 
+  private build(partial?: Partial<T>): T {
+    const entity = this.prepareEntity();
+
+    this.enrichWithMixins(entity);
+    this.enrichWithId(entity);
+    this.enrichWithProps(entity);
+    this.enrichWithComputed(entity);
     Object.assign(entity, partial);
 
     return entity;
@@ -85,6 +97,6 @@ export class Builder<T> {
   }
 
   public resetId() {
-    this.idCounter = 1;
+    this._idCounter = this._options.defaultIdValue;
   }
 }

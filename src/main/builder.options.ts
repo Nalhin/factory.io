@@ -8,7 +8,7 @@ export class BuilderOptions<T, K extends keyof T> {
    *
    *@param number  unique number
    */
-  idTransformer?: (id: number) => number | string;
+  idTransformer?: (id: number) => T[K];
   /**
    * Whether undefined fields should be removed (as constructor is passed with no arguments, fields  without default values are assigned as undefined).
    */

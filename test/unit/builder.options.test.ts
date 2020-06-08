@@ -20,7 +20,7 @@ describe('factoryOptions', () => {
 
   describe('idFactory', () => {
     it('should allow to declare function responsible for id generation', () => {
-      const expectedId = 1;
+      const expectedId = '1';
       const userFactory = new Factory<User>()
         .options({
           idField: 'id',

@@ -41,10 +41,10 @@ export class Factory<T> {
 
   done(): Builder<T> {
     return new Builder<T>(
-      this._options,
       this._properties,
       this._computed,
       this._mixins,
+      this._options,
       this.entity,
     );
   }
