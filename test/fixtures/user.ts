@@ -3,8 +3,6 @@ export class User {
   username: string;
   password: string;
   age: number;
-  email: string;
-  birthDay: Date;
   monthsAlive?: number;
   friend?: PartialUser;
 
@@ -18,6 +16,10 @@ export class PartialUser {
   id?: string;
   username: string;
   age: number;
-  birthDay: Date;
   friend?: PartialUser;
+
+  constructor(age: number, username: string) {
+    this.age = age;
+    this.username = username;
+  }
 }

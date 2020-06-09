@@ -1,7 +1,7 @@
 import { Computed, Properties } from '../types/types';
 import { Class } from '../types/helpers';
 import { BuilderOptions } from './builder.options';
-import isObject from './utils';
+import { mergeDeep, isObject, isFunc } from './utils';
 
 export class Builder<T> {
   private _idCounter = this._options.defaultIdValue;
@@ -38,9 +38,11 @@ export class Builder<T> {
   ) {
     for (const key of Object.keys(properties)) {
       if (isObject(properties[key])) {
-        entity[key] = {};
+        if (!isObject(entity[key])) {
+          entity[key] = {};
+        }
         this.setRecursiveProperties(entity[key], properties[key]);
-      } else if (typeof properties[key] === 'function') {
+      } else if (isFunc(properties[key])) {
         entity[key] = properties[key]();
       } else {
         entity[key] = properties[key];
@@ -65,8 +67,23 @@ export class Builder<T> {
   }
 
   private enrichWithComputed(entity: T): void {
-    for (const key of Object.keys(this._computed)) {
-      entity[key] = this._computed[key](entity);
+    this.setRecursiveComputed(entity, entity, this._computed);
+  }
+
+  private setRecursiveComputed<T>(
+    entity: T,
+    current: T,
+    computed: Computed<T, keyof T>,
+  ): void {
+    for (const key of Object.keys(computed)) {
+      if (isObject(computed[key])) {
+        if (!isObject(current[key])) {
+          current[key] = {};
+        }
+        this.setRecursiveComputed(entity, current[key], computed[key]);
+      } else if (isFunc(computed[key])) {
+        current[key] = computed[key](entity);
+      }
     }
   }
 
@@ -77,7 +94,7 @@ export class Builder<T> {
     this.enrichWithId(entity);
     this.enrichWithProps(entity);
     this.enrichWithComputed(entity);
-    Object.assign(entity, partial);
+    mergeDeep(entity, partial);
 
     return entity;
   }
@@ -86,11 +103,11 @@ export class Builder<T> {
     return this.build(partial);
   }
 
-  public buildMany(count: number): T[] {
+  public buildMany(count: number, options?: { partial?: Partial<T> }): T[] {
     const entities = [];
 
     for (let i = 0; i < count; i++) {
-      entities.push(this.build());
+      entities.push(this.build(options?.partial));
     }
 
     return entities;

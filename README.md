@@ -6,8 +6,8 @@
 
 # factory.io
 
-Modern class based mock data generation with typescript support.
-Integrates exceptionally well with Orm libraries like TypeORM.
+A modern class-based mock data generation with typescript support.
+Integrates exceptionally well with ORM libraries like TypeORM.
 
 ## Table of contents
 
@@ -33,30 +33,32 @@ Factory can be constructed with the following (chaining) methods.
 
 **Things to remember**
 
-- Properties can be assigned in any order (assignment order does not matter).
-- Execution order.
+- Methods can be called in any order (assignment order is set in stone)
+- Execution order:
   - constructor
   - removeUnassigned (if set in options)
   - mixins
   - props
   - computed
   - partial
-- Objects with recursive dependencies are not currently supported.
 - Many to many relationships can be assigned via computed method.
 - Methods defined on any other than the current class are stripped away.
 
 ### Props
 
-Props should be provided as values or functions.
+Props should be provided as values, functions or nested objects consisting of values and functions.
 
-- Plain values are always the same
-- Functions are recalculated on every build
+- Plain values are always set as provided.
+- Functions are recalculated each time an object is build.
 
 ```ts
 const userFactory = new Factory(User)
   .props({
     age: faker.random.number,
     username: faker.internet.userName,
+    friend: {
+      username: faker.internet.userName,
+    },
   })
   .done();
 
@@ -65,7 +67,7 @@ const user = userFactory.buildOne();
 
 ### Computed
 
-Computed properties should be provided as functions. They have access to the object after props are already assigned.
+Computed properties should be provided as functions or nested objects. They can reference the main object(after mixins and props are assigned).
 
 ```ts
 const userFactory = new Factory(User)
@@ -82,7 +84,7 @@ const user = userFactory.buildOne();
 ### Mixins
 
 Use mixins in order to extend previously constructed factory.
-Remember that mixins are resolved in a **given order and before** props and computed of factory currently being extended.
+Remember that mixins are resolved in a **the same order and before** props and computed of factory currently being extended.
 
 ```ts
 const mixinUserFactory = new Factory(User)
@@ -95,7 +97,7 @@ const mixinUserFactory = new Factory(User)
 const userFactory = new Factory(User)
   .props({
     /*
-      Age value is overridden
+      Mixin age value is overridden
     */
     age: faker.random.number,
   })
@@ -115,19 +117,16 @@ const result = userFactory.buildOne();
 ### Done
 
 `done()` method transforms class factory into class builder.
-Class builders **cannot** be assigned new properties and this process cannot be reversed.
+This process cannot be reversed.
+Class builders **cannot** be assigned new properties.
 
 ### Builder
 
 Builder object has the following methods
 
 - buildOne
-- buildOneAsync
 - buildMany
-- buildManyAsync
 - resetId
-
-Async methods expect callback to be passed as the first argument.
 
 ## Examples
 
@@ -161,7 +160,7 @@ const result = userFactory.buildOne({ id: 1 });
 const userFactory = new Factory<IUser>()
   .props({ age: faker.random.number, username: faker.internet.userName })
   .computed({
-    monthsAlive: (entity) => entity.age * 12,
+    monthsAlive: (user) => user.age * 12,
   })
   .done();
 
@@ -177,9 +176,6 @@ const result = userFactory.buildMany(5);
 ```
 
 ### TypeORM integration
-
-Factory.io integrates exceptionally with orm libraries.
-Async methods (saveOneAsync, saveManyAsync) allow us to persist and retrieve entities in just one line!
 
 #### Entity
 
@@ -212,10 +208,10 @@ export const userFactory = new Factory(User)
 #### Utils
 
 ```ts
-async function saveOne(entity: any) {
+async function saveOne(current: any) {
   try {
-    const repository = getConnection().getRepository(entity.constructor.name);
-    return await repository.save(entity);
+    const repository = getConnection().getRepository(current.constructor.name);
+    return await repository.save(current);
   } catch (e) {
     console.log(e);
   }
@@ -226,7 +222,7 @@ async function saveOne(entity: any) {
 
 ```ts
 it('should save data to db', async () => {
-  const user = await userFactory.buildOneAsync(saveOne);
+  const user = await saveOne(userFactory.buildOne());
 
   const result = await getConnection()
     .getRepository(user.constructor.name)

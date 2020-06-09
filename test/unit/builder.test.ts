@@ -1,7 +1,6 @@
 import faker from 'faker';
 import { Factory } from '../../src';
 import { User } from '../fixtures/user';
-import { Post } from '../fixtures/post';
 
 describe('builder', () => {
   describe('build', () => {
@@ -26,31 +25,6 @@ describe('builder', () => {
       expect(result.age).toBe(expectedAge);
     });
 
-    it('should allow to assign properties as functions', () => {
-      const expectedAge = faker.random.number();
-      const userFactory = new Factory(User).prop('age', expectedAge).done();
-
-      const result = userFactory.buildOne();
-
-      expect(result.age).toBe(expectedAge);
-    });
-
-    it('should allow to assign properties as objects/primitives', () => {
-      const expectedAge = faker.random.number();
-      const userFactory = new Factory(User).prop('age', expectedAge).done();
-      const postFactory = new Factory(Post)
-        .props({
-          likedBy: () => userFactory.buildMany(4),
-          author: () => userFactory.buildOne(),
-        })
-        .done();
-
-      const result = postFactory.buildOne();
-
-      expect(result.author.age).toBe(expectedAge);
-      expect(result.likedBy[3].age).toBe(expectedAge);
-    });
-
     it('should assign object properties in correct order', () => {
       const age = faker.random.number();
       const userFactory = new Factory(User)
@@ -65,30 +39,6 @@ describe('builder', () => {
       const result = userFactory.buildOne();
 
       expect(result.age).toBe(age * 2);
-    });
-
-    it('should resolve recursive props', () => {
-      const username = faker.random.word();
-
-      const userFactory = new Factory(User)
-        .props({
-          friend: {
-            username,
-            age: faker.random.number,
-            birthDay: faker.date.future(),
-            friend: {
-              username,
-              age: faker.random.number,
-              birthDay: faker.date.future(),
-            },
-          },
-        })
-        .done();
-
-      const result = userFactory.buildOne();
-
-      expect(result.friend.friend.username).toBe(username);
-      expect(typeof result.friend.friend.age).toBe('number');
     });
 
     it('should work with interfaces', () => {
@@ -138,6 +88,7 @@ describe('builder', () => {
 
       expect(result.length).toBe(count);
     });
+
     it('should create objects with different properties, if properties are passed as functions', () => {
       const userFactory = new Factory(User)
         .props({
@@ -149,26 +100,43 @@ describe('builder', () => {
 
       expect(result[0].username).not.toBe(result[1].username);
     });
+
     it('should create objects with similar properties, if properties are passed as primitives', () => {
       const userFactory = new Factory(User)
         .props({
           username: faker.internet.userName(),
         })
         .done();
+
       const result = userFactory.buildMany(2);
 
       expect(result[0].username).toBe(result[1].username);
+    });
+
+    it('should assign partial', () => {
+      const expectedUsername = faker.internet.userName();
+      const userFactory = new Factory(User)
+        .props({
+          username: faker.internet.userName(),
+        })
+        .done();
+
+      const result = userFactory.buildMany(2, {
+        partial: { username: expectedUsername },
+      });
+
+      expect(result[1].username).toBe(expectedUsername);
     });
   });
 
   describe('resetId', () => {
     it('should reset object enumeration', () => {
-      const defaultIdValue = 1;
+      const defaultIdValue = 2;
       const userFactory = new Factory(User)
         .options({ idField: 'id', defaultIdValue })
         .done();
-      userFactory.buildMany(5);
 
+      userFactory.buildMany(5);
       userFactory.resetId();
       const result = userFactory.buildOne();
 

@@ -1,6 +1,7 @@
 import { Factory } from '../../src';
 import { PartialUser, User } from '../fixtures/user';
 import * as faker from 'faker';
+import { Post } from '../fixtures/post';
 
 describe('factory', () => {
   describe('prop', () => {
@@ -76,6 +77,81 @@ describe('factory', () => {
 
       expect(expected).toEqual(result);
     });
+
+    it('should allow to assign properties as functions', () => {
+      const expectedAge = faker.random.number();
+      const userFactory = new Factory(User).prop('age', expectedAge).done();
+
+      const result = userFactory.buildOne();
+
+      expect(result.age).toBe(expectedAge);
+    });
+
+    it('should allow to assign properties as objects/primitives', () => {
+      const expectedAge = faker.random.number();
+      const userFactory = new Factory(User).prop('age', expectedAge).done();
+      const postFactory = new Factory(Post)
+        .props({
+          likedBy: () => userFactory.buildMany(4),
+          author: () => userFactory.buildOne(),
+        })
+        .done();
+
+      const result = postFactory.buildOne();
+
+      expect(result.author.age).toBe(expectedAge);
+      expect(result.likedBy[3].age).toBe(expectedAge);
+    });
+
+    it('should resolve recursive props', () => {
+      const username = faker.random.word();
+
+      const userFactory = new Factory(User)
+        .props({
+          username: 'dd',
+          friend: {
+            username,
+            age: faker.random.number,
+            friend: {
+              username,
+              age: faker.random.number,
+            },
+          },
+        })
+        .done();
+
+      const result = userFactory.buildOne();
+
+      expect(result.friend.friend.username).toBe(username);
+      expect(typeof result.friend.friend.age).toBe('number');
+    });
+
+    it('should not override mixin fields (if nested)', () => {
+      const expectedUsername = faker.random.word();
+      const expectedAge = faker.random.number();
+      const partialUserMixin = new Factory(PartialUser)
+        .props({
+          username: faker.random.word,
+          friend: {
+            username: expectedUsername,
+            age: faker.random.number,
+          },
+        })
+        .done();
+      const userMixin = new Factory(User)
+        .props({
+          friend: {
+            age: expectedAge,
+          },
+        })
+        .mixins([partialUserMixin])
+        .done();
+
+      const result = userMixin.buildOne();
+
+      expect(result.friend.username).toBe(expectedUsername);
+      expect(result.friend.age).toBe(expectedAge);
+    });
   });
 
   describe('computed', () => {
@@ -118,6 +194,32 @@ describe('factory', () => {
       const result = userFactory.buildOne();
 
       expect(result).toEqual(expected);
+    });
+
+    it('should resolve recursive computed', () => {
+      const username = faker.random.word();
+
+      const userFactory = new Factory(User)
+        .props({
+          username: username,
+          friend: {
+            username,
+            age: faker.random.number,
+          },
+        })
+        .computed({
+          friend: {
+            friend: {
+              username: (entity) => entity.username,
+            },
+          },
+        })
+        .done();
+
+      const result = userFactory.buildOne();
+
+      expect(result.friend.username).toBe(username);
+      expect(result.friend.friend.username).toBe(username);
     });
   });
 
