@@ -5,8 +5,6 @@ export class BuilderOptions<T, K extends keyof T> {
   idField?: K;
   /**
    * Custom function responsible for object id generation.
-   *
-   *@param number  unique number
    */
   idTransformer?: (id: number) => T[K];
   /**

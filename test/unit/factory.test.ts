@@ -122,8 +122,8 @@ describe('factory', () => {
 
       const result = userFactory.buildOne();
 
-      expect(result.friend.friend.username).toBe(username);
-      expect(typeof result.friend.friend.age).toBe('number');
+      expect(result.friend?.friend?.username).toBe(username);
+      expect(typeof result.friend?.friend?.age).toBe('number');
     });
 
     it('should not override mixin fields (if nested)', () => {
@@ -149,8 +149,8 @@ describe('factory', () => {
 
       const result = userMixin.buildOne();
 
-      expect(result.friend.username).toBe(expectedUsername);
-      expect(result.friend.age).toBe(expectedAge);
+      expect(result.friend?.username).toBe(expectedUsername);
+      expect(result.friend?.age).toBe(expectedAge);
     });
   });
 
@@ -218,8 +218,8 @@ describe('factory', () => {
 
       const result = userFactory.buildOne();
 
-      expect(result.friend.username).toBe(username);
-      expect(result.friend.friend.username).toBe(username);
+      expect(result.friend?.username).toBe(username);
+      expect(result.friend?.friend?.username).toBe(username);
     });
   });
 

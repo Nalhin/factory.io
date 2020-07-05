@@ -58,6 +58,36 @@ describe('builder', () => {
 
       expect(result).toEqual(properties);
     });
+
+    it('should preserve this binding', () => {
+      const username = faker.internet.userName();
+      const friendFactory = new Factory(User)
+        .props({
+          username,
+          friend: {
+            friend: {
+              username,
+            },
+          },
+        })
+        .computed({
+          friend: {
+            friend: {
+              username: (e) => e.username,
+            },
+          },
+        })
+        .done();
+      const userFactory = new Factory(User)
+        .props({
+          friend: friendFactory.buildOne,
+        })
+        .done();
+
+      const result = userFactory.buildOne();
+
+      expect(result.friend?.username).toBe(username);
+    });
   });
 
   describe('buildOne', () => {

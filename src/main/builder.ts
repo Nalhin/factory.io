@@ -4,7 +4,7 @@ import { BuilderOptions } from './builder.options';
 import { mergeDeep, isObject, isFunc } from './utils';
 
 export class Builder<T> {
-  private _idCounter = this._options.defaultIdValue;
+  private _idCounter = this._options.defaultIdValue as number;
 
   constructor(
     private _properties: Properties<T, keyof T>,
@@ -35,7 +35,7 @@ export class Builder<T> {
   private setRecursiveProperties(
     entity: T,
     properties: Properties<T, keyof T>,
-  ) {
+  ): void {
     for (const key of Object.keys(properties)) {
       if (isObject(properties[key])) {
         if (!isObject(entity[key])) {
@@ -87,33 +87,33 @@ export class Builder<T> {
     }
   }
 
-  private build(partial?: Partial<T>): T {
+  private build = (partial?: Partial<T>): T => {
     const entity = this.prepareEntity();
 
     this.enrichWithMixins(entity);
     this.enrichWithId(entity);
     this.enrichWithProps(entity);
     this.enrichWithComputed(entity);
-    mergeDeep(entity, partial);
 
-    return entity;
-  }
-
-  public buildOne(partial?: Partial<T>): T {
-    return this.build(partial);
-  }
-
-  public buildMany(count: number, options?: { partial?: Partial<T> }): T[] {
-    const entities = [];
-
-    for (let i = 0; i < count; i++) {
-      entities.push(this.build(options?.partial));
+    if (partial) {
+      mergeDeep(entity, partial);
     }
 
-    return entities;
-  }
+    return entity;
+  };
+
+  public buildOne = (partial?: Partial<T>): T => {
+    return this.build(partial);
+  };
+
+  public buildMany = (
+    count: number,
+    options?: { partial?: Partial<T> },
+  ): T[] => {
+    return [...Array(count)].map(() => this.build(options?.partial));
+  };
 
   public resetId() {
-    this._idCounter = this._options.defaultIdValue;
+    this._idCounter = this._options.defaultIdValue as number;
   }
 }
