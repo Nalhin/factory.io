@@ -6,25 +6,34 @@ import { Post } from '../fixtures/post';
 describe('FactoryBuilder', () => {
   describe('ctor', () => {
     it('should pass arguments to constructor', () => {
-      const userFactory = FactoryBuilder.of(User).ctor<typeof User>(['3', 'username', 'password', 18]).build();
+      const userFactory = FactoryBuilder.of(User).ctor(['4', 'username', 'password', 18]).build();
 
       const result = userFactory.buildOne();
 
-      expect(result.id).toBe('3');
+      expect(result.id).toBe('4');
       expect(result.username).toBe('username');
       expect(result.password).toBe('password');
       expect(result.age).toBe(18);
     });
 
     it('should resolve arguments provided as function', () => {
-      const userFactory = FactoryBuilder.of(User).ctor<typeof User>(() => ['3', 'username', 'password', 18]).build();
+      const userFactory = FactoryBuilder.of(User).ctor([() => '1', () => 'username', () => 'password', () => 18]).build();
 
       const result = userFactory.buildOne();
 
-      expect(result.id).toBe('3');
+      expect(result.id).toBe('1');
       expect(result.username).toBe('username');
       expect(result.password).toBe('password');
       expect(result.age).toBe(18);
+    });
+
+    it('should allow to combine functions and values', () => {
+      const userFactory = FactoryBuilder.of(User).ctor(['1', 'username', () => 'password', () => 18]).build();
+
+      const result = userFactory.buildOne();
+
+      expect(result.id).toBe('1');
+      expect(result.username).toBe('username');
     });
   });
 

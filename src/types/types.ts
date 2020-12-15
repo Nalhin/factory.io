@@ -23,4 +23,7 @@ export type Computed<T> = {
   [K in keyof T]?: Comp<T, T, K>;
 };
 
-export type CtorArgs<T> = T extends new (...args: infer U) => any ? U : never
+export type CtorArgs<T extends Class<any>> =
+  TupleToReturnEachType<ConstructorParameters<T>>
+
+export type TupleToReturnEachType<T extends any[]> = { [K in keyof T]: (() => T[K]) | T[K] }

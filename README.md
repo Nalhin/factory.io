@@ -53,6 +53,14 @@ initialized without certain constructor arguments.
 - Plain values are always the same.
 - Functions are recalculated each time an object is built.
 
+```ts
+const userFactory = FactoryBuilder.of(User)
+  .ctor([faker.random.number, 12])
+  .build();
+
+const result = userFactory.buildOne();
+```
+
 ### Props
 
 Props should be provided as values, functions or nested objects consisting of values and functions.
@@ -71,7 +79,7 @@ const userFactory = FactoryBuilder.of(User)
   })
   .build();
 
-const user = userFactory.buildOne();
+const result = userFactory.buildOne();
 ```
 
 ### Computed
@@ -89,7 +97,7 @@ const userFactory = FactoryBuilder.of(User)
   })
   .build();
 
-const user = userFactory.buildOne();
+const result = userFactory.buildOne();
 ```
 
 ### Mixins
@@ -126,7 +134,7 @@ const result = userFactory.buildOne();
   arguments, fields without default values are assigned undefined)
 - defaultSequenceValue - Initial sequence value, incremented by one each time an object is build
 
-### Build 
+### Build
 
 `build()` method transforms FactoryBuilder into Factory. This process cannot be reversed. Factories **cannot**
 be assigned new properties.

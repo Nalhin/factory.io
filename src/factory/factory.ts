@@ -2,7 +2,7 @@ import { Class, Computed, CtorArgs, Properties } from '../types/types';
 import { FactoryOptions } from './factory-options';
 import { mergeDeep, isObject, isFunction } from '../utils/utils';
 
-export class Factory<T> {
+export class Factory<T, C extends Class<T> = never> {
   private _idCounter = this._options.defaultSequenceValue;
 
   constructor(
@@ -10,7 +10,7 @@ export class Factory<T> {
     private _computed: Computed<T>,
     private _mixin: Factory<T>[],
     private _options: FactoryOptions<T, keyof T>,
-    private _ctor: CtorArgs<Class<T>> | (() => CtorArgs<Class<T>>) | undefined,
+    private _ctor?: CtorArgs<C>,
     private _entity?: Class<T>,
   ) {
   }
@@ -20,11 +20,7 @@ export class Factory<T> {
 
     if (this._entity) {
       if (this._ctor) {
-        if (isFunction(this._ctor)) {
-          entity = new this._entity(...this._ctor());
-        } else {
-          entity = new this._entity(...this._ctor);
-        }
+        entity = new this._entity(...(this._ctor as unknown as any[]).map(arg => isFunction(arg) ? arg() : arg));
       } else {
         entity = new this._entity();
       }
