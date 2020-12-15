@@ -6,8 +6,8 @@
 
 # factory.io
 
-A modern class-based mock data generation with typescript support. It integrates exceptionally well with ORM libraries such
-as TypeORM.
+A modern class-based test factory generation with TypeScript support. It integrates exceptionally well with popular
+TypeScript class-based libraries such as [TypeORM](https://www.npmjs.com/package/typeorm).
 
 ## Table of contents
 
@@ -48,7 +48,7 @@ Factories can be constructed with the following (chaining) methods.
 Props should be provided as values, functions or nested objects consisting of values and functions.
 
 - Plain values are always the same.
-- Functions are recalculated each time an object is build.
+- Functions are recalculated each time an object is built.
 
 ```ts
 const userFactory = FactoryBuilder.of(User)
@@ -84,8 +84,8 @@ const user = userFactory.buildOne();
 
 ### Mixins
 
-Use mixins in order to extend previously constructed factories. Remember that mixins are resolved in **provided order**
-and **before** props and computed of factory currently being extended.
+Use mixins to extend previously constructed factories. Remember that mixins are resolved in **provided order**
+and **before** props and computed of factory currently being expanded.
 
 ```ts
 const mixinUserFactory = FactoryBuilder.of(User)
@@ -111,8 +111,8 @@ const result = userFactory.buildOne();
 ### Options
 
 - sequenceField - Object property to which sequence value should be assigned
-- sequenceTransformer - Custom function responsible for sequence assignment (allows to modify the value pre-assignment) 
-- removeUnassignedProperties - Whether undefined properties should be removed (as constructor is passed with no
+- sequenceTransformer - Custom function responsible for sequence assignment (allows to modify the value pre-assignment)
+- removeUnassignedProperties - Whether undefined properties should be removed (as the constructor is passed with no
   arguments, fields without default values are assigned undefined)
 - defaultSequenceValue - Initial sequence value, incremented by one each time an object is build
 
@@ -123,7 +123,7 @@ be assigned new properties.
 
 ### Builder
 
-Builder object has the following methods
+Builder object has the following methods.
 
 - buildOne
 - buildMany
