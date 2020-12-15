@@ -1,3 +1,3 @@
-import { Factory } from './main/factory';
+import { FactoryBuilder } from './factory/factory-builder';
 
-export { Factory };
+export { FactoryBuilder };

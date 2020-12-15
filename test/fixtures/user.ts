@@ -6,9 +6,11 @@ export class User {
   monthsAlive?: number;
   friend?: PartialUser;
 
-  constructor(id: string, username: string) {
+  constructor(id: string, username: string, password: string, age: number) {
     this.id = id;
     this.username = username;
+    this.password = password;
+    this.age = age;
   }
 }
 

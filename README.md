@@ -6,8 +6,8 @@
 
 # factory.io
 
-A modern class-based mock data generation with typescript support.
-Integrates exceptionally well with ORM libraries like TypeORM.
+A modern class-based mock data generation with typescript support. It integrates exceptionally well with ORM libraries such
+as TypeORM.
 
 ## Table of contents
 
@@ -16,7 +16,7 @@ Integrates exceptionally well with ORM libraries like TypeORM.
 - [Computed](#computed)
 - [Mixins](#mixins)
 - [Options](#options)
-- [Done](#done)
+- [Factory.build()](#factory.build())
 - [Builder](#builder)
 - [Examples](#examples)
 - [TypeORM integration](#typeorm-integration)
@@ -24,7 +24,7 @@ Integrates exceptionally well with ORM libraries like TypeORM.
 
 ## Usage
 
-Factory can be constructed with the following (chaining) methods.
+Factories can be constructed with the following (chaining) methods.
 
 - props or prop (properties to be assigned)
 - computed (values calculated based on props or default object properties)
@@ -33,26 +33,25 @@ Factory can be constructed with the following (chaining) methods.
 
 **Things to remember**
 
-- Methods can be called in any order (assignment order is set in stone)
+- Methods can be called in any order - execution order is predefined
 - Execution order:
   - constructor
-  - removeUnassigned (if set in options)
+  - removeUnassignedProperties (if set in options)
   - mixins
   - props
   - computed
   - partial
-- Many to many relationships can be assigned via computed method.
-- Methods defined on any other than the current class are stripped away.
+- Relations between objects can be assigned with computed method.
 
 ### Props
 
 Props should be provided as values, functions or nested objects consisting of values and functions.
 
-- Plain values are always set as provided.
+- Plain values are always the same.
 - Functions are recalculated each time an object is build.
 
 ```ts
-const userFactory = new Factory(User)
+const userFactory = FactoryBuilder.of(User)
   .props({
     age: faker.random.number,
     username: faker.internet.userName,
@@ -60,41 +59,43 @@ const userFactory = new Factory(User)
       username: faker.internet.userName,
     },
   })
-  .done();
+  .build();
 
 const user = userFactory.buildOne();
 ```
 
 ### Computed
 
-Computed properties should be provided as functions or nested objects. They can reference the main object(after mixins and props are assigned).
+Computed properties should be provided as functions or nested objects. They can reference the main object (and objects
+it references) after mixins and props are assigned.
 
 ```ts
-const userFactory = new Factory(User)
+const userFactory = FactoryBuilder.of(User)
   .computed({
     age: (e) => e.age * 2,
   })
   .props({
     age,
-  });
+  })
+  .build();
 
 const user = userFactory.buildOne();
 ```
 
 ### Mixins
 
-Use mixins in order to extend previously constructed factory.
-Remember that mixins are resolved in a **the same order and before** props and computed of factory currently being extended.
+Use mixins in order to extend previously constructed factories. Remember that mixins are resolved in **provided order**
+and **before** props and computed of factory currently being extended.
 
 ```ts
-const mixinUserFactory = new Factory(User)
+const mixinUserFactory = FactoryBuilder.of(User)
   .props({
     age: faker.random.number,
     username: faker.internet.userName,
   })
-  .done();
+  .build();
 
-const userFactory = new Factory(User)
+const userFactory = FactoryBuilder.of(User)
   .props({
     /*
       Mixin age value is overridden
@@ -102,23 +103,23 @@ const userFactory = new Factory(User)
     age: faker.random.number,
   })
   .mixins([mixinUserFactory])
-  .done();
+  .build();
 
 const result = userFactory.buildOne();
 ```
 
 ### Options
 
-- idField - Object property to which id should be assigned
-- idTransformer - Custom function responsible for object id generation.
-- removeUnassigned - Whether undefined properties should be removed (as constructor is passed with no arguments, fields without default values are assigned undefined)
-- defaultIdValue - Initial id value, incremented by one in each time an object is build
+- sequenceField - Object property to which sequence value should be assigned
+- sequenceTransformer - Custom function responsible for sequence assignment (allows to modify the value pre-assignment) 
+- removeUnassignedProperties - Whether undefined properties should be removed (as constructor is passed with no
+  arguments, fields without default values are assigned undefined)
+- defaultSequenceValue - Initial sequence value, incremented by one each time an object is build
 
-### Done
+### Factory.build()
 
-`done()` method transforms class factory into class builder.
-This process cannot be reversed.
-Class builders **cannot** be assigned new properties.
+`build()` method transforms FactoryBuilder into Factory. This process cannot be reversed. Factories **cannot**
+be assigned new properties.
 
 ### Builder
 
@@ -126,30 +127,30 @@ Builder object has the following methods
 
 - buildOne
 - buildMany
-- resetId
+- resetSequence
 
 ## Examples
 
 ### Classes
 
 ```ts
-const userFactory = new Factory(User)
+const userFactory = FactoryBuilder.of(User)
   .props({
     age: faker.random.number,
     username: faker.internet.userName,
   })
-  .done();
+  .build();
 
 const result = userFactory.buildOne({ id: 1 });
 ```
 
 ```ts
-const userFactory = new Factory(User)
+const userFactory = FactoryBuilder.of(User)
   .props({
     age: faker.random.number,
     username: faker.internet.userName,
   })
-  .done();
+  .build();
 
 const result = userFactory.buildOne({ id: 1 });
 ```
@@ -157,20 +158,20 @@ const result = userFactory.buildOne({ id: 1 });
 ### Interfaces
 
 ```ts
-const userFactory = new Factory<IUser>()
+const userFactory = FactoryBuilder<IUser>.of()
   .props({ age: faker.random.number, username: faker.internet.userName })
   .computed({
     monthsAlive: (user) => user.age * 12,
   })
-  .done();
+  .build();
 
 const result = userFactory.buildMany(4);
 ```
 
 ```ts
-const userFactory = new Factory<IUser>()
+const userFactory = FactoryBuilder<IUser>.of()
   .props({ age: faker.random.number, username: faker.internet.userName })
-  .done();
+  .build();
 
 const result = userFactory.buildMany(5);
 ```
@@ -196,13 +197,13 @@ export class User {
 #### Factory
 
 ```ts
-export const userFactory = new Factory(User)
-  .options({ idField: 'id' })
+export const userFactory = FactoryBuilder.of(User)
+  .options({ sequenceField: 'id' })
   .props({
     email: faker.internet.email,
     password: faker.internet.password,
   })
-  .done();
+  .build();
 ```
 
 #### Utils

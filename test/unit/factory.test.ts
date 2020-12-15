@@ -1,263 +1,176 @@
-import { Factory } from '../../src';
-import { PartialUser, User } from '../fixtures/user';
-import * as faker from 'faker';
-import { Post } from '../fixtures/post';
+import faker from 'faker';
+import { FactoryBuilder } from '../../src';
+import { User } from '../fixtures/user';
 
-describe('factory', () => {
-  describe('prop', () => {
-    it('should add property given as function', () => {
-      const password = faker.internet.password();
-      const userFactory = new Factory(User)
-        .prop('password', () => password)
-        .done();
-
-      const result = userFactory.buildOne();
-
-      expect(result.password).toBe(password);
-    });
-
-    it('should add property given as object/primitive', () => {
-      const password = faker.internet.password();
-      const userFactory = new Factory(User).prop('password', password).done();
-
-      const result = userFactory.buildOne();
-
-      expect(result.password).toBe(password);
-    });
-
-    it('should add properties in correct order', () => {
-      const password = faker.internet.password();
-      const userFactory = new Factory(User)
-        .prop('password', faker.internet.password())
-        .prop('password', faker.internet.password())
-        .prop('password', password)
-        .done();
-
-      const result = userFactory.buildOne();
-
-      expect(result.password).toBe(password);
-    });
-  });
-
-  describe('props', () => {
-    it('should add multiple properties to an object', () => {
-      const expected = {
-        password: faker.internet.password(),
-        username: faker.internet.userName(),
-        age: faker.random.number(),
-        email: faker.internet.email(),
-        birthDay: faker.date.recent(),
-        id: faker.random.uuid(),
-      };
-      const userFactory = new Factory(User).props(expected).done();
-
-      const result = userFactory.buildOne();
-
-      expect(expected).toEqual(result);
-    });
-
-    it('should add multiple properties to an object', () => {
-      const expected = {
-        password: faker.internet.password(),
-        username: faker.internet.userName(),
-        id: faker.random.uuid(),
-      };
-      const userFactory = new Factory(User)
+describe('Factory', () => {
+  describe('build', () => {
+    it('should override mixin properties correctly', () => {
+      const expectedAge = faker.random.number();
+      const mixinUserFactory = FactoryBuilder.of(User)
         .props({
-          password: expected.password,
+          age: faker.random.number,
           username: faker.internet.userName,
         })
+        .build();
+
+      const userFactory = FactoryBuilder.of(User)
         .props({
-          username: expected.username,
-          id: expected.id,
+          age: expectedAge,
         })
-        .done();
-
-      const result = userFactory.buildOne();
-
-      expect(expected).toEqual(result);
-    });
-
-    it('should allow to assign properties as functions', () => {
-      const expectedAge = faker.random.number();
-      const userFactory = new Factory(User).prop('age', expectedAge).done();
+        .mixins([mixinUserFactory])
+        .build();
 
       const result = userFactory.buildOne();
 
       expect(result.age).toBe(expectedAge);
     });
 
-    it('should allow to assign properties as objects/primitives', () => {
-      const expectedAge = faker.random.number();
-      const userFactory = new Factory(User).prop('age', expectedAge).done();
-      const postFactory = new Factory(Post)
-        .props({
-          likedBy: () => userFactory.buildMany(4),
-          author: () => userFactory.buildOne(),
+    it('should assign object properties in correct order', () => {
+      const age = faker.random.number();
+      const userFactory = FactoryBuilder.of(User)
+        .computed({
+          age: (e) => e.age * 2,
         })
-        .done();
-
-      const result = postFactory.buildOne();
-
-      expect(result.author.age).toBe(expectedAge);
-      expect(result.likedBy[3].age).toBe(expectedAge);
-    });
-
-    it('should resolve recursive props', () => {
-      const username = faker.random.word();
-
-      const userFactory = new Factory(User)
-        .props({
-          username: 'dd',
-          friend: {
-            username,
-            age: faker.random.number,
-            friend: {
-              username,
-              age: faker.random.number,
-            },
-          },
-        })
-        .done();
-
-      const result = userFactory.buildOne();
-
-      expect(result.friend?.friend?.username).toBe(username);
-      expect(typeof result.friend?.friend?.age).toBe('number');
-    });
-
-    it('should not override mixin fields (if nested)', () => {
-      const expectedUsername = faker.random.word();
-      const expectedAge = faker.random.number();
-      const partialUserMixin = new Factory(PartialUser)
-        .props({
-          username: faker.random.word,
-          friend: {
-            username: expectedUsername,
-            age: faker.random.number,
-          },
-        })
-        .done();
-      const userMixin = new Factory(User)
-        .props({
-          friend: {
-            age: expectedAge,
-          },
-        })
-        .mixins([partialUserMixin])
-        .done();
-
-      const result = userMixin.buildOne();
-
-      expect(result.friend?.username).toBe(expectedUsername);
-      expect(result.friend?.age).toBe(expectedAge);
-    });
-  });
-
-  describe('computed', () => {
-    it('should add computed to an object', () => {
-      const age = 18;
-      const userFactory = new Factory(User)
         .props({
           age,
         })
-        .computed({
-          monthsAlive: (entity) => entity.age * 12,
-        })
-        .done();
+        .build();
 
       const result = userFactory.buildOne();
 
-      expect(result.monthsAlive).toBe(age * 12);
+      expect(result.age).toBe(age * 2);
     });
 
-    it('should add multiple computed to an object', () => {
+    it('should work with interfaces', () => {
+      interface TestInterface {
+        id: number;
+        firstName: string;
+      }
+
       const properties = {
-        age: faker.random.number(),
-        username: faker.internet.userName(),
+        id: faker.random.number(),
+        firstName: faker.name.findName(),
       };
-      const expected = {
-        ...properties,
-        monthsAlive: properties.age * 12,
-        password: properties.age * 12 + properties.username,
-      };
-      const userFactory = new Factory(User)
-        .props(properties)
-        .computed({
-          monthsAlive: (entity) => entity.age * 12,
-        })
-        .computed({
-          password: (entity) => entity.monthsAlive + entity.username,
-        })
-        .done();
+
+      const userFactory = FactoryBuilder.of<TestInterface>().props(properties).build();
 
       const result = userFactory.buildOne();
 
-      expect(result).toEqual(expected);
+      expect(result).toEqual(properties);
     });
 
-    it('should resolve recursive computed', () => {
-      const username = faker.random.word();
-
-      const userFactory = new Factory(User)
+    it('should preserve this binding', () => {
+      const username = faker.internet.userName();
+      const friendFactory = FactoryBuilder.of(User)
         .props({
-          username: username,
+          username,
           friend: {
-            username,
-            age: faker.random.number,
+            friend: {
+              username,
+            },
           },
         })
         .computed({
           friend: {
             friend: {
-              username: (entity) => entity.username,
+              username: (e) => e.username,
             },
           },
         })
-        .done();
+        .build();
+      const userFactory = FactoryBuilder.of(User)
+        .props({
+          friend: friendFactory.buildOne,
+        })
+        .build();
 
       const result = userFactory.buildOne();
 
       expect(result.friend?.username).toBe(username);
-      expect(result.friend?.friend?.username).toBe(username);
     });
   });
 
-  describe('mixins', () => {
-    it('should allow to extend factory with preexisting one', () => {
-      const expectedAge = faker.random.number();
+  describe('buildOne', () => {
+    it('should allow to override properties with preexisting object given as partial type', () => {
       const properties = {
-        age: faker.random.number(),
+        id: faker.random.uuid(),
         username: faker.internet.userName(),
       };
-      const mixinUserFactory = new Factory(User).props(properties).done();
-      const userFactory = new Factory(User)
-        .props({ age: expectedAge })
-        .mixins([mixinUserFactory])
-        .done();
-
-      const result = userFactory.buildOne();
-
-      expect(result.age).toBe(expectedAge);
-      expect(result.username).toBe(properties.username);
-    });
-    it('should resolve multiple mixins in correct order', () => {
-      const expectedUsername = faker.internet.userName();
-      const mixinPartialUserFactory = new Factory(PartialUser)
-        .computed({
-          username: () => faker.internet.userName(),
+      const userFactory = FactoryBuilder.of(User)
+        .props({
+          id: faker.random.uuid(),
+          username: faker.internet.userName,
         })
-        .done();
-      const mixinUserFactory = new Factory(User)
-        .props({ username: expectedUsername })
-        .done();
-      const userFactory = new Factory(User)
-        .mixins([mixinPartialUserFactory, mixinUserFactory])
-        .done();
+        .build();
 
+      const result = userFactory.buildOne(properties);
+
+      expect(result).toEqual(properties);
+    });
+  });
+
+  describe('buildMany', () => {
+    it('should build multiple objects', () => {
+      const count = 5;
+      const userFactory = FactoryBuilder.of(User).build();
+
+      const result = userFactory.buildMany(count);
+
+      expect(result.length).toBe(count);
+    });
+
+    it('should create objects with different properties, if properties are passed as functions', () => {
+      const userFactory = FactoryBuilder.of(User)
+        .props({
+          username: faker.internet.userName,
+        })
+        .build();
+
+      const result = userFactory.buildMany(2);
+
+      expect(result[0].username).not.toBe(result[1].username);
+    });
+
+    it('should create objects with similar properties, if properties are passed as primitives', () => {
+      const userFactory = FactoryBuilder.of(User)
+        .props({
+          username: faker.internet.userName(),
+        })
+        .build();
+
+      const result = userFactory.buildMany(2);
+
+      expect(result[0].username).toBe(result[1].username);
+    });
+
+    it('should assign partial', () => {
+      const expectedUsername = faker.internet.userName();
+      const userFactory = FactoryBuilder.of(User)
+        .props({
+          username: faker.internet.userName(),
+        })
+        .build();
+
+      const result = userFactory.buildMany(2, {
+        partial: { username: expectedUsername },
+      });
+
+      expect(result[1].username).toBe(expectedUsername);
+    });
+  });
+
+  describe('resetId', () => {
+    it('should reset object enumeration', () => {
+      const defaultIdValue = 2;
+      const userFactory = FactoryBuilder.of(User)
+        .options({ sequenceField: 'id', defaultSequenceValue: defaultIdValue })
+        .build();
+
+      userFactory.buildMany(5);
+      userFactory.resetSequence();
       const result = userFactory.buildOne();
 
-      expect(result.username).toBe(expectedUsername);
+      expect(result.id).toBe(defaultIdValue);
     });
   });
 });
