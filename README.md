@@ -17,7 +17,7 @@ TypeScript class-based libraries such as [TypeORM](https://www.npmjs.com/package
 - [Mixins](#mixins)
 - [Options](#options)
 - [Factory.build()](#factory.build())
-- [Builder](#builder)
+- [Factory](#factory)
 - [Examples](#examples)
 - [TypeORM integration](#typeorm-integration)
 - [License](#license)
@@ -28,8 +28,8 @@ Factories can be constructed with the following (chaining) methods.
 
 - props or prop (properties to be assigned)
 - computed (values calculated based on props or default object properties)
-- mixins (factories for partial of provided class)
-- done (returns class builder)
+- mixins (factories expanded by current factory)
+- build (returns class factory)
 
 **Things to remember**
 
@@ -121,9 +121,9 @@ const result = userFactory.buildOne();
 `build()` method transforms FactoryBuilder into Factory. This process cannot be reversed. Factories **cannot**
 be assigned new properties.
 
-### Builder
+### Factory 
 
-Builder object has the following methods.
+Factory object has the following methods.
 
 - buildOne
 - buildMany
