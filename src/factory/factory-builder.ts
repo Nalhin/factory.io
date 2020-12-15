@@ -1,5 +1,4 @@
-import { Computed, Properties, Property } from '../types/types';
-import { Class } from '../types/helpers';
+import { Class, Computed, CtorArgs, Properties, Property } from '../types/types';
 import { Factory } from './factory';
 import { DEFAULT_OPTIONS, FactoryConfiguration, FactoryOptions } from './factory-options';
 
@@ -8,12 +7,18 @@ export class FactoryBuilder<T> {
   private _properties: Properties<T> = {};
   private _computed: Computed<T> = {};
   private _mixins: Factory<T>[] = [];
+  private _ctor: CtorArgs<Class<T>> | (() => CtorArgs<Class<T>>) | undefined;
 
   private constructor(private entity?: Class<T>) {
   }
 
   public static of<E>(entity?: Class<E>): FactoryBuilder<E> {
     return new this<E>(entity);
+  }
+
+  public ctor<K extends Class<T>>(ctorArgs: ConstructorParameters<K> | (() => ConstructorParameters<K>)): FactoryBuilder<T> {
+    this._ctor = ctorArgs as unknown as CtorArgs<Class<T>> | (() => CtorArgs<Class<T>>);
+    return this;
   }
 
   public options<K extends keyof T>(options: FactoryConfiguration<T, K>): FactoryBuilder<T> {
@@ -47,6 +52,7 @@ export class FactoryBuilder<T> {
       this._computed,
       this._mixins,
       this._options,
+      this._ctor,
       this.entity,
     );
   }

@@ -12,11 +12,12 @@ TypeScript class-based libraries such as [TypeORM](https://www.npmjs.com/package
 ## Table of contents
 
 - [Usage](#usage)
+- [Ctor](#ctor)
 - [Props](#props)
 - [Computed](#computed)
 - [Mixins](#mixins)
 - [Options](#options)
-- [Factory.build()](#factory.build())
+- [Build](#build)
 - [Factory](#factory)
 - [Examples](#examples)
 - [TypeORM integration](#typeorm-integration)
@@ -26,6 +27,7 @@ TypeScript class-based libraries such as [TypeORM](https://www.npmjs.com/package
 
 Factories can be constructed with the following (chaining) methods.
 
+- ctor (constructor arguments)
 - props or prop (properties to be assigned)
 - computed (values calculated based on props or default object properties)
 - mixins (factories expanded by current factory)
@@ -42,6 +44,14 @@ Factories can be constructed with the following (chaining) methods.
   - computed
   - partial
 - Relations between objects can be assigned with computed method.
+
+### Ctor
+
+Ctor arguments are passed to class constructor during object initialization. This is useful when a class cannot be
+initialized without certain constructor arguments.
+
+- Plain values are always the same.
+- Functions are recalculated each time an object is built.
 
 ### Props
 
@@ -116,12 +126,12 @@ const result = userFactory.buildOne();
   arguments, fields without default values are assigned undefined)
 - defaultSequenceValue - Initial sequence value, incremented by one each time an object is build
 
-### Factory.build()
+### Build 
 
 `build()` method transforms FactoryBuilder into Factory. This process cannot be reversed. Factories **cannot**
 be assigned new properties.
 
-### Factory 
+### Factory
 
 Factory object has the following methods.
 

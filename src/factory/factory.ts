@@ -1,5 +1,4 @@
-import { Computed, Properties } from '../types/types';
-import { Class } from '../types/helpers';
+import { Class, Computed, CtorArgs, Properties } from '../types/types';
 import { FactoryOptions } from './factory-options';
 import { mergeDeep, isObject, isFunction } from '../utils/utils';
 
@@ -11,15 +10,28 @@ export class Factory<T> {
     private _computed: Computed<T>,
     private _mixin: Factory<T>[],
     private _options: FactoryOptions<T, keyof T>,
+    private _ctor: CtorArgs<Class<T>> | (() => CtorArgs<Class<T>>) | undefined,
     private _entity?: Class<T>,
   ) {
   }
 
   private prepareEntity(): T {
-    const entity = this._entity ? new this._entity() : ({} as T);
+    let entity = ({} as T);
+
+    if (this._entity) {
+      if (this._ctor) {
+        if (isFunction(this._ctor)) {
+          entity = new this._entity(...this._ctor());
+        } else {
+          entity = new this._entity(...this._ctor);
+        }
+      } else {
+        entity = new this._entity();
+      }
+    }
 
     if (this._options.removeUnassignedProperties) {
-      for (const key of Object.keys(entity) as Array<keyof T>) {
+      for (const key of Object.keys(entity) as (keyof T)[]) {
         if (entity[key] === undefined) {
           delete entity[key];
         }

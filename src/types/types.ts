@@ -1,3 +1,7 @@
+export interface Class<T, A extends any[] = any[]> extends Function {
+  new(...args: A): T;
+}
+
 export type Property<T, K extends keyof T> =
   | (() => T[K])
   | T[K]
@@ -18,3 +22,5 @@ export type RecComputed<E, T> = {
 export type Computed<T> = {
   [K in keyof T]?: Comp<T, T, K>;
 };
+
+export type CtorArgs<T> = T extends new (...args: infer U) => any ? U : never

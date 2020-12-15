@@ -3,7 +3,32 @@ import { PartialUser, User } from '../fixtures/user';
 import * as faker from 'faker';
 import { Post } from '../fixtures/post';
 
-describe('FactoryInitializer', () => {
+describe('FactoryBuilder', () => {
+  describe('ctor', () => {
+    it('should pass arguments to constructor', () => {
+      const userFactory = FactoryBuilder.of(User).ctor<typeof User>(['3', 'username', 'password', 18]).build();
+
+      const result = userFactory.buildOne();
+
+      expect(result.id).toBe('3');
+      expect(result.username).toBe('username');
+      expect(result.password).toBe('password');
+      expect(result.age).toBe(18);
+    });
+
+    it('should resolve arguments provided as function', () => {
+      const userFactory = FactoryBuilder.of(User).ctor<typeof User>(() => ['3', 'username', 'password', 18]).build();
+
+      const result = userFactory.buildOne();
+
+      expect(result.id).toBe('3');
+      expect(result.username).toBe('username');
+      expect(result.password).toBe('password');
+      expect(result.age).toBe(18);
+    });
+  });
+
+
   describe('prop', () => {
     it('should add property given as function', () => {
       const password = faker.internet.password();
