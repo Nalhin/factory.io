@@ -4,12 +4,7 @@ import { User } from '../fixtures/user';
 describe('factoryOptions', () => {
   describe('sequenceField', () => {
     it('should allow to assign id field and should generate unique ids', () => {
-      interface TestInterface {
-        id: number;
-        firstName: string;
-      }
-
-      const userFactory = FactoryBuilder.of<TestInterface>()
+      const userFactory = FactoryBuilder.of<{ id: number, firstName: string }>()
         .options({ sequenceField: 'id' })
         .build();
 

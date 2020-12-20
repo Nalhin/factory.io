@@ -1,6 +1,6 @@
 {
   "name": "factory.io",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Modern class based mock data generation with typescript support.",
   "keywords": [
     "factory",
@@ -42,7 +42,6 @@
   "devDependencies": {
     "@types/faker": "^5.1.5",
     "@types/jest": "^26.0.19",
-    "@types/merge-deep": "^3.0.0",
     "@typescript-eslint/eslint-plugin": "^3.10.1",
     "@typescript-eslint/parser": "^3.10.1",
     "eslint": "^7.15.0",
@@ -56,6 +55,7 @@
     "typescript": "^4.1.3"
   },
   "dependencies": {
-    "merge-deep": "^3.0.2"
+    "@types/lodash.assignin": "^4.2.6",
+    "lodash.assignin": "^4.2.0"
   }
 }

@@ -42,17 +42,15 @@ describe('Factory', () => {
     });
 
     it('should work with interfaces', () => {
-      interface TestInterface {
-        id: number;
-        firstName: string;
-      }
-
       const properties = {
         id: faker.random.number(),
         firstName: faker.name.findName(),
       };
 
-      const userFactory = FactoryBuilder.of<TestInterface>().props(properties).build();
+      const userFactory = FactoryBuilder.of<{
+        id: number;
+        firstName: string;
+      }>().props(properties).build();
 
       const result = userFactory.buildOne();
 
@@ -91,12 +89,29 @@ describe('Factory', () => {
   });
 
   describe('buildOne', () => {
-    it('should allow to override properties with preexisting object given as partial type', () => {
+    it('should allow to override properties of a class instance with preexisting object given as partial type', () => {
       const properties = {
         id: faker.random.uuid(),
         username: faker.internet.userName(),
       };
       const userFactory = FactoryBuilder.of(User)
+        .props({
+          id: faker.random.uuid(),
+          username: faker.internet.userName,
+        })
+        .build();
+
+      const result = userFactory.buildOne(properties);
+
+      expect(result).toEqual(properties);
+    });
+
+    it('should allow to override properties of an object with preexisting object given as partial type', () => {
+      const properties = {
+        id: faker.random.uuid(),
+        username: faker.internet.userName(),
+      };
+      const userFactory = FactoryBuilder.of<{ id: string, username: string }>()
         .props({
           id: faker.random.uuid(),
           username: faker.internet.userName,
